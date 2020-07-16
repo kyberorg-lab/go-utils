@@ -48,7 +48,7 @@ func getEnvTest() {
 
 	if !exists {
 		fmt.Println("Failed. ENV", envKey, "was set, but func reported false")
-	} else if valueFromGetEnv == envValue {
+	} else if valueFromGetEnv != envValue {
 		fmt.Println("Failed. Value from GetEnv returns mismatch value. Original", envValue, "We have",
 			valueFromGetEnv)
 	}
