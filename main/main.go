@@ -25,6 +25,6 @@ func cryptoTest() {
 		panic("Decrypt Error")
 	}
 	if decryptedText != cleanText {
-		t.Fail()
+		fmt.Println("Failed. Text mismatch", decryptedText, cleanText)
 	}
 }
