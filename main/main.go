@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"github.com/kyberorg/go-utils/crypto/aesgcm"
+	"os"
 )
 
 func main() {
 	cryptoTest()
+	getEnvTest()
 }
 
 func cryptoTest() {
@@ -32,4 +34,12 @@ func cryptoTest() {
 	if decryptedText != cleanText {
 		fmt.Println("Failed. Text mismatch", decryptedText, cleanText)
 	}
+}
+
+func getEnvTest() {
+	envKey := "MY_VAR"
+	envValue := "myValue"
+
+	os.Setenv(envKey, envValue)
+
 }
