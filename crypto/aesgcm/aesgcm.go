@@ -9,7 +9,6 @@ import (
 )
 
 const (
-	SaltLen            = 32
 	KeyLen             = 32
 	NumberOfIterations = 1048576
 	RelativeMemoryCost = 8
@@ -17,8 +16,8 @@ const (
 )
 
 // Encrypts data (aka passwords) with key (shared secret) returns encrypted text
-func Encrypt(plainText, sharedKey []byte) ([]byte, error) {
-	sharedKey, err := deriveKey(sharedKey)
+func Encrypt(plainText, sharedKey, salt []byte) ([]byte, error) {
+	sharedKey, err := deriveKey(sharedKey, salt)
 	if err != nil {
 		return nil, err
 	}
@@ -45,11 +44,12 @@ func Encrypt(plainText, sharedKey []byte) ([]byte, error) {
 }
 
 // Encrypts data (aka passwords) with key (shared secret) returns base64-encoded string
-func EncryptString(plainTextData, sharedKey string) (string, error) {
+func EncryptString(plainTextData, sharedKey, salt string) (string, error) {
 	bPlainData := []byte(plainTextData)
 	bSharedKey := []byte(sharedKey)
+	bSalt := []byte(salt)
 
-	encrypted, err := Encrypt(bPlainData, bSharedKey)
+	encrypted, err := Encrypt(bPlainData, bSharedKey, bSalt)
 	if err != nil {
 		return "", err
 	}
@@ -59,8 +59,8 @@ func EncryptString(plainTextData, sharedKey string) (string, error) {
 }
 
 // Decrypts data (passwords etc) encrypted with Encrypt function using the same key (shared secret)
-func Decrypt(encryptedData, sharedKey []byte) ([]byte, error) {
-	sharedKey, err := deriveKey(sharedKey)
+func Decrypt(encryptedData, sharedKey, salt []byte) ([]byte, error) {
+	sharedKey, err := deriveKey(sharedKey, salt)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func Decrypt(encryptedData, sharedKey []byte) ([]byte, error) {
 }
 
 // Decrypts data (passwords etc) encrypted with Encrypt function using the same key (shared secret). Returns decrypted string
-func DecryptString(encryptedData, sharedKey string) (string, error) {
+func DecryptString(encryptedData, sharedKey, salt string) (string, error) {
 	var bEncryptedData []byte
 
 	if isBase64String(encryptedData) {
@@ -95,17 +95,17 @@ func DecryptString(encryptedData, sharedKey string) (string, error) {
 	}
 
 	bSharedKey := []byte(sharedKey)
+	bSalt := []byte(salt)
 
-	plainText, err := Decrypt(bEncryptedData, bSharedKey)
+	plainText, err := Decrypt(bEncryptedData, bSharedKey, bSalt)
 	if err != nil {
 		return "", err
 	}
 	return string(plainText), nil
 }
 
-func deriveKey(password []byte) ([]byte, error) {
-	staticSalt := []byte("My Static Salt") //FIXME static salt
-	key, err := scrypt.Key(password, staticSalt, NumberOfIterations, RelativeMemoryCost, RelativeCPUCost, KeyLen)
+func deriveKey(password, salt []byte) ([]byte, error) {
+	key, err := scrypt.Key(password, salt, NumberOfIterations, RelativeMemoryCost, RelativeCPUCost, KeyLen)
 	if err != nil {
 		return nil, err
 	}

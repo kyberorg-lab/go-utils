@@ -15,17 +15,18 @@ func main() {
 func cryptoTest() {
 	cleanText := "Salasana"
 	sharedSecret := "SharedSecret"
+	salt := "Salt"
 
 	fmt.Println("Clean Text: ", cleanText, "Shared secret (aka secret key password)", sharedSecret)
 
-	encryptedText, encryptError := aesgcm.EncryptString(cleanText, sharedSecret)
+	encryptedText, encryptError := aesgcm.EncryptString(cleanText, sharedSecret, salt)
 	if encryptError != nil {
 		fmt.Println(encryptError)
 		panic("Encrypted Error")
 	}
 	fmt.Println("Encrypted text", encryptedText)
 
-	decryptedText, decryptError := aesgcm.DecryptString(encryptedText, sharedSecret)
+	decryptedText, decryptError := aesgcm.DecryptString(encryptedText, sharedSecret, salt)
 	if decryptError != nil {
 		fmt.Println(decryptError)
 		panic("Decrypt Error")
