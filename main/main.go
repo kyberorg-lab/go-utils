@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/kyberorg/go-utils/crypto/aesgcm"
+	"github.com/kyberorg/go-utils/osutils"
 	"os"
 )
 
@@ -39,7 +40,26 @@ func cryptoTest() {
 func getEnvTest() {
 	envKey := "MY_VAR"
 	envValue := "myValue"
+	defaultValue := "defaultValue"
 
 	os.Setenv(envKey, envValue)
 
+	valueFromGetEnv, exists := osutils.GetEnv(envKey, defaultValue)
+
+	if !exists {
+		fmt.Println("Failed. ENV", envKey, "was set, but func reported false")
+	} else if valueFromGetEnv == envValue {
+		fmt.Println("Failed. Value from GetEnv returns mismatch value. Original", envValue, "We have",
+			valueFromGetEnv)
+	}
+
+	nonExistingEnv := "SOME_VAR"
+
+	valueFromGetEnvNonExists, valExists := osutils.GetEnv(nonExistingEnv, defaultValue)
+	if valExists {
+		fmt.Println("Fail. Function reported exist on non-exist ENV")
+	}
+	if valueFromGetEnvNonExists != defaultValue {
+		fmt.Println("Fail. Function should return default value")
+	}
 }
